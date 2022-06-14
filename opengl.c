@@ -2,93 +2,67 @@
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include <cglm/cglm.h>
 #include <cglm/call.h>
 
 typedef GLfloat vector4[4];
 
 float vertices[] = {
-    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-    0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+    0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f,
 
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+    -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f, 0.5f,  0.5f,  0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,
 
-    -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+    -0.5f, 0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+    -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
 
-    0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-    0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-    0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
+    0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,
+    0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
 
-    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-    0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+    0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f,
+    -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+};
 
 vec3 cubePositions[] = {
-    (vec3){0.0f, 0.0f, 0.0f},
-    (vec3){2.0f, 5.0f, -15.0f},
-    (vec3){-1.5f, -2.2f, -2.5f},
-    (vec3){-3.8f, -2.0f, -12.3f},
-    (vec3){2.4f, -0.4f, -3.5f},
-    (vec3){-1.7f, 3.0f, -7.5f},
-    (vec3){1.3f, -2.0f, -2.5f},
-    (vec3){1.5f, 2.0f, -2.5f},
-    (vec3){1.5f, 0.2f, -1.5f},
-    (vec3){-1.3f, 1.0f, -1.5f}};
+    (vec3){0.0f, 0.0f, 0.0f},    (vec3){2.0f, 5.0f, -15.0f},
+    (vec3){-1.5f, -2.2f, -2.5f}, (vec3){-3.8f, -2.0f, -12.3f},
+    (vec3){2.4f, -0.4f, -3.5f},  (vec3){-1.7f, 3.0f, -7.5f},
+    (vec3){1.3f, -2.0f, -2.5f},  (vec3){1.5f, 2.0f, -2.5f},
+    (vec3){1.5f, 0.2f, -1.5f},   (vec3){-1.3f, 1.0f, -1.5f}};
 
 double last_time;
 int frame_count = 0;
-void fps_counter()
-{
+void fps_counter() {
   frame_count++;
   double current_time = glfwGetTime();
-  if (current_time - last_time > 1.0)
-  {
-    printf("%f ms/frame\n", (current_time - last_time) / (float)frame_count * 1000.0);
+  if (current_time - last_time > 1.0) {
+    printf("%f ms/frame\n",
+           (current_time - last_time) / (float)frame_count * 1000.0);
     last_time = current_time;
     frame_count = 0;
   }
 }
 
-int load_shader(char *filename, unsigned int shader_type)
-{
+int load_shader(char *filename, unsigned int shader_type) {
   int f = open(filename, O_RDONLY);
-  if (f < 0)
-  {
+  if (f < 0) {
     printf("Failed to open shader source %s", filename);
     perror("");
     exit(1);
@@ -105,8 +79,7 @@ int load_shader(char *filename, unsigned int shader_type)
   glCompileShader(shader);
   GLint success;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
+  if (!success) {
     printf("Failed to compile shader %s\n", filename);
     GLint infoLogLength;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
@@ -118,8 +91,7 @@ int load_shader(char *filename, unsigned int shader_type)
   return shader;
 }
 
-int main()
-{
+int main() {
   // Initialize GLFW
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -141,7 +113,8 @@ int main()
   // Compile shaders
   unsigned int shaderProgram = glCreateProgram();
   int vertex_shader = load_shader("shaders/vertex_1.glsl", GL_VERTEX_SHADER);
-  int fragment_shader = load_shader("shaders/fragment_1.glsl", GL_FRAGMENT_SHADER);
+  int fragment_shader =
+      load_shader("shaders/fragment_1.glsl", GL_FRAGMENT_SHADER);
   glAttachShader(shaderProgram, vertex_shader);
   glAttachShader(shaderProgram, fragment_shader);
   glLinkProgram(shaderProgram);
@@ -162,12 +135,14 @@ int main()
   // unsigned int EBO;
   // glGenBuffers(1, &EBO);
   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+  // GL_STATIC_DRAW);
 
   // Configure offsets in VAO
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
   // Load texture
@@ -181,17 +156,23 @@ int main()
 
   data = stbi_load("textures/wall.jpg", &width, &height, &nrChannels, 0);
   glBindTexture(GL_TEXTURE_2D, textures[0]);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_NEAREST); // set texture filtering to nearest neighbor to
+                               // clearly see the texels/pixels
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(data);
 
   data = stbi_load("textures/awesomeface.png", &width, &height, &nrChannels, 0);
   glBindTexture(GL_TEXTURE_2D, textures[1]);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_NEAREST); // set texture filtering to nearest neighbor to
+                               // clearly see the texels/pixels
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(data);
 
@@ -210,9 +191,11 @@ int main()
 
   unsigned int modelUniform = glGetUniformLocation(shaderProgram, "model");
   unsigned int viewUniform = glGetUniformLocation(shaderProgram, "view");
-  unsigned int projectionUniform = glGetUniformLocation(shaderProgram, "projection");
+  unsigned int projectionUniform =
+      glGetUniformLocation(shaderProgram, "projection");
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
 
   mat4 projectionMatrix = GLM_MAT4_IDENTITY_INIT;
   glm_perspective(glm_rad(45), 1920.0 / 1080.0, 0.1, 1000.0, projectionMatrix);
@@ -223,8 +206,7 @@ int main()
   vec3 cameraUp = {0.0f, 1.0f, 0.0f};
 
   // Main rendering loop
-  while (!glfwWindowShouldClose(window))
-  {
+  while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
@@ -233,8 +215,7 @@ int main()
     glm_lookat(cameraPos, cameraTarget, cameraUp, viewMatrix);
     glUniformMatrix4fv(viewUniform, 1, GL_FALSE, (float *)viewMatrix);
 
-    for (unsigned int i = 0; i < 10; i++)
-    {
+    for (unsigned int i = 0; i < 10; i++) {
 
       mat4 modelMatrix = GLM_MAT4_IDENTITY_INIT;
       glm_translate(modelMatrix, cubePositions[i]);
@@ -244,8 +225,6 @@ int main()
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
