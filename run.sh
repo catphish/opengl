@@ -2,5 +2,5 @@
 
 set -e
 
-gcc opengl.c -lGL -lGLEW -lglfw -lm -o opengl
+gcc *.c -lGL -lGLEW -lglfw -lm -o opengl
 ./opengl
