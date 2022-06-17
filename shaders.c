@@ -10,6 +10,7 @@
 void set_int(GLuint program, char *name, int value) { glUniform1i(glGetUniformLocation(program, name), value); }
 void set_float(GLuint program, char *name, float value) { glUniform1f(glGetUniformLocation(program, name), value); }
 void set_mat4(GLuint program, char *name, mat4 mat) { glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE, (float *)mat); }
+void set_vec3(GLuint program, char *name, vec3 vec) { glUniform3fv(glGetUniformLocation(program, name), 1, (float *)vec); }
 
 GLuint compile_shader(char *filename, GLenum shader_type) {
   GLint success;
